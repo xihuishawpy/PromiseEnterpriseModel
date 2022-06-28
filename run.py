@@ -65,10 +65,7 @@ all_data['date_null_rate'] = all_data[date_cols].apply(lambda x: x.isnull().sum(
 # 分割出日期类型中得小时
 def split_date(x):
 #     print(x,type(x))
-    if type(x)==float:
-        return np.nan
-    else:
-        return int(x.split(':')[0])
+    return np.nan if type(x)==float else int(x.split(':')[0])
 for col in date_cols:
     all_data[col] = all_data[col].apply(lambda x: split_date(x))
 
@@ -84,9 +81,9 @@ def youbian_encode(x):
         if len(str(int(float(x))))>3:
             x = int(str(int(float(x)))+'0'*(6-len(str(int(float(x))))))
         elif len(str(int(float(x))))==3:
-            x=int('266'+str(int(float(x))))
+            x = int(f'266{int(float(x))}')
         elif len(str(int(float(x))))==2:
-            x = int('2667'+str(int(float(x))))
+            x = int(f'2667{int(float(x))}')
         else:
             x = 266000
     elif pd.isna(x):
@@ -144,7 +141,7 @@ def tf_idf(all_data, col, n_components=5):
     svd_enc = TruncatedSVD(n_components=n_components, n_iter=20, random_state=2020)
     vec_svd = svd_enc.fit_transform(tfidf_vec)
     vec_svd = pd.DataFrame(vec_svd)
-    vec_svd.columns = ['SVD_{}_{}'.format(col, i) for i in range(n_components)]
+    vec_svd.columns = [f'SVD_{col}_{i}' for i in range(n_components)]
     vec_svd = vec_svd.reset_index(drop= True)
     return vec_svd
 
